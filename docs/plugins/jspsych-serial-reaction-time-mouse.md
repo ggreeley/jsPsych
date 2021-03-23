@@ -4,7 +4,7 @@ The serial reaction time mouse plugin implements a generalized version of the SR
 
 ## Parameters
 
-In addition to the [parameters available in all plugins](overview.md#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Other parameters can be left unspecified if the default value is acceptable.
+In addition to the [parameters available in all plugins](/overview/plugins#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Other parameters can be left unspecified if the default value is acceptable.
 
 | Parameter                 | Type           | Default Value | Description                              |
 | ------------------------- | -------------- | ------------- | ---------------------------------------- |
@@ -21,13 +21,15 @@ In addition to the [parameters available in all plugins](overview.md#parameters-
 
 ## Data Generated
 
-In addition to the [default data collected by all plugins](overview.md#data-collected-by-plugins), this plugin collects the following data for each trial.
+In addition to the [default data collected by all plugins](/overview/plugins#data-collected-by-all-plugins), this plugin collects the following data for each trial.
 
 | Name   | Type    | Value                                    |
 | ------ | ------- | ---------------------------------------- |
-| grid   | JSON    | A JSON-encoded representation of the grid. |
-| target | JSON    | A JSON-encoded representation of the target on the grid. |
+| grid   | array   | The grid representation. Each inner array represents a single row. The entries in the inner arrays represent the columns. This will be encoded as a JSON string when data is saved using the `.json()` or `.csv()` functions. |
+| target | array   | The `[row, column]` target location on the grid. This will be encoded as a JSON string when data is saved using the `.json()` or `.csv()` functions. |
 | rt     | numeric | The response time in milliseconds for the subject to make a response. The time is measured from when the second stimulus first appears on the screen until the subject's response. |
+| response | array | The `[row, column]` response location on the grid. This will be encoded as a JSON string when data is saved using the `.json()` or `.csv()` functions. |
+| correct | boolean | Whether the response location matches the target location (`true`) or not (`false`)l
 
 ## Examples
 

@@ -4,7 +4,7 @@ The same-different-html plugin displays two stimuli sequentially. Stimuli are HT
 
 ## Parameters
 
-In addition to the [parameters available in all plugins](overview.md#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Other parameters can be left unspecified if the default value is acceptable.
+In addition to the [parameters available in all plugins](/overview/plugins#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Other parameters can be left unspecified if the default value is acceptable.
 
 | Parameter            | Type    | Default Value | Description                              |
 | -------------------- | ------- | ------------- | ---------------------------------------- |
@@ -20,12 +20,12 @@ In addition to the [parameters available in all plugins](overview.md#parameters-
 
 ## Data Generated
 
-In addition to the [default data collected by all plugins](overview.md#data-collected-by-plugins), this plugin collects the following data for each trial.
+In addition to the [default data collected by all plugins](/overview/plugins#data-collected-by-all-plugins), this plugin collects the following data for each trial.
 
 | Name      | Type    | Value                                    |
 | --------- | ------- | ---------------------------------------- |
-| stimulus  | string  | An JSON-encoded array of length 2 containing the HTML-formatted content that the subject saw for each trial. |
-| key_press | string  | Indicates which key the subject pressed. |
+| stimulus  | array   | An array of length 2 containing the HTML-formatted content that the subject saw for each trial. This will be encoded as a JSON string when data is saved using the `.json()` or `.csv()` functions. |
+| response  | string  | Indicates which key the subject pressed. |
 | rt        | numeric | The response time in milliseconds for the subject to make a response. The time is measured from when the second stimulus first appears on the screen until the subject's response. |
 | correct   | boolean | `true` if the subject's response matched the `answer` for this trial. |
 | answer    | string  | The correct answer to the trial, either `'same'` or `'different'`. |
@@ -35,7 +35,7 @@ Additionally, if `first_stim_duration` is  null, then the following data is also
 | Name            | Type    | Value                                    |
 | --------------- | ------- | ---------------------------------------- |
 | rt_stim1        | numeric | The response time in milliseconds for the subject to continue after the first stimulus. The time is measured from when the first stimulus appears on the screen until the subject's response. |
-| key_press_stim1 | string  | Indicates which key the subject pressed to continue. |
+| response_stim1  | string  | Indicates which key the subject pressed to continue. |
 
 ## Examples
 

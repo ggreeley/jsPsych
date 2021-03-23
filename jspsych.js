@@ -1,10 +1,3 @@
-/**
- * jspsych.js
- * Josh de Leeuw
- *
- * documentation: docs.jspsych.org
- *
- **/
 window.jsPsych = (function() {
 
   var core = {};
@@ -106,7 +99,8 @@ window.jsPsych = (function() {
         'minimum_valid_rt': 0,
         'experiment_width': null,
         'override_safe_mode': false,
-        'case_sensitive_responses': false
+        'case_sensitive_responses': false,
+        'extensions': []
       };
 
       // detect whether page is running in browser as a local file, and if so, disable web audio and video preloading to prevent CORS issues
@@ -195,12 +189,39 @@ window.jsPsych = (function() {
         function(){
           // success! user can continue...
           // start experiment
-          startExperiment();
+          loadExtensions();
         },
         function(){
           // fail. incompatible user.
         }
       );
+
+      function loadExtensions() {
+        // run the .initialize method of any extensions that are in use
+        // these should return a Promise to indicate when loading is complete
+        if (opts.extensions.length == 0) {
+          startExperiment();
+        } else {
+          var loaded_extensions = 0;
+          for (var i = 0; i < opts.extensions.length; i++) {
+            var ext_params = opts.extensions[i].params;
+            if (!ext_params) {
+              ext_params = {}
+            }
+            jsPsych.extensions[opts.extensions[i].type].initialize(ext_params)
+              .then(() => {
+                loaded_extensions++;
+                if (loaded_extensions == opts.extensions.length) {
+                  startExperiment();
+                }
+              })
+              .catch((error_message) => {
+                console.error(error_message);
+              })
+          }
+        }
+      }
+
     };
     
     // execute init() when the document is ready
@@ -262,6 +283,35 @@ window.jsPsych = (function() {
     // of the DataCollection, for easy access and editing.
     var trial_data_values = trial_data.values()[0];
 
+    if(typeof current_trial.save_trial_parameters == 'object'){
+      var keys = Object.keys(current_trial.save_trial_parameters);
+      for(var i=0; i<keys.length; i++){
+        var key_val = current_trial.save_trial_parameters[keys[i]];
+        if(key_val === true){
+          if(typeof current_trial[keys[i]] == 'undefined'){
+            console.warn(`Invalid parameter specified in save_trial_parameters. Trial has no property called "${keys[i]}".`)
+          } else if(typeof current_trial[keys[i]] == 'function'){
+            trial_data_values[keys[i]] = current_trial[keys[i]].toString();
+          } else {
+            trial_data_values[keys[i]] = current_trial[keys[i]];
+          }
+        }
+        if(key_val === false){
+          // we don't allow internal_node_id or trial_index to be deleted because it would break other things
+          if(keys[i] !== 'internal_node_id' && keys[i] !== 'trial_index'){
+            delete trial_data_values[keys[i]];
+          }
+        }
+      }
+    }
+    // handle extension callbacks
+    if(Array.isArray(current_trial.extensions)){
+      for(var i=0; i<current_trial.extensions.length; i++){
+        var ext_data_values = jsPsych.extensions[current_trial.extensions[i].type].on_finish(current_trial.extensions[i].params);
+        Object.assign(trial_data_values, ext_data_values);
+      }
+    }
+    
     // about to execute lots of callbacks, so switch context.
     jsPsych.internal.call_immediate = true;
 
@@ -473,7 +523,7 @@ window.jsPsych = (function() {
     // update the current trial node to be completed
     // returns true if the node is complete after advance (all subnodes are also complete)
     // returns false otherwise
-    this.advance = function() {
+    this.advance = function () {
 
       // first check to see if done
       if (progress.done) {
@@ -484,10 +534,10 @@ window.jsPsych = (function() {
       // then try to start the node.
       if (progress.current_location == -1) {
         // check for on_timeline_start and conditonal function on nodes with timelines
-        if (typeof timeline_parameters != 'undefined') {
+        if (typeof timeline_parameters !== 'undefined') {
           // only run the conditional function if this is the first repetition of the timeline when
           // repetitions > 1, and only when on the first variable set
-          if (typeof timeline_parameters.conditional_function !== 'undefined' && progress.current_repetition==0 && progress.current_variable_set == 0) {
+          if (typeof timeline_parameters.conditional_function !== 'undefined' && progress.current_repetition == 0 && progress.current_variable_set == 0) {
             jsPsych.internal.call_immediate = true;
             var conditional_result = timeline_parameters.conditional_function();
             jsPsych.internal.call_immediate = false;
@@ -497,20 +547,15 @@ window.jsPsych = (function() {
               progress.done = true;
               return true;
             }
-            // // if the conditonal_function() returns true, then the node can start
-            // else {
-            //   progress.current_location = 0;
-            // }
           }
+
           // if we reach this point then the node has its own timeline and will start
-          // so we need to check if there is an on_timeline_start function
-          if (typeof timeline_parameters.on_timeline_start !== 'undefined'){
+          // so we need to check if there is an on_timeline_start function if we are on the first variable set
+          if (typeof timeline_parameters.on_timeline_start !== 'undefined' && progress.current_variable_set == 0) {
             timeline_parameters.on_timeline_start();
           }
-          // // if there is no conditional_function, then the node can start
-          // else {
-          //   progress.current_location = 0;
-          // }
+          
+
         }
         // if we reach this point, then either the node doesn't have a timeline of the 
         // conditional function returned true and it can start
@@ -538,7 +583,7 @@ window.jsPsych = (function() {
         }
 
         // if we've reached the end of the timeline (which, if the code is here, we have)
-            
+
         // there are a few steps to see what to do next...
 
         // first, check the timeline_variables to see if we need to loop through again
@@ -554,7 +599,7 @@ window.jsPsych = (function() {
         else if (progress.current_repetition < timeline_parameters.repetitions - 1) {
           this.nextRepetiton();
           // check to see if there is an on_timeline_finish function
-          if (typeof timeline_parameters.on_timeline_finish !== 'undefined'){
+          if (typeof timeline_parameters.on_timeline_finish !== 'undefined') {
             timeline_parameters.on_timeline_finish();
           }
           return this.advance();
@@ -564,7 +609,7 @@ window.jsPsych = (function() {
         // if we're all done with the repetitions...
         else {
           // check to see if there is an on_timeline_finish function
-          if (typeof timeline_parameters.on_timeline_finish !== 'undefined'){
+          if (typeof timeline_parameters.on_timeline_finish !== 'undefined') {
             timeline_parameters.on_timeline_finish();
           }
 
@@ -582,7 +627,7 @@ window.jsPsych = (function() {
             }
           }
 
-       
+
         }
 
         // no more loops on this timeline, we're done!
@@ -947,6 +992,13 @@ window.jsPsych = (function() {
       trial.on_start(trial);
     }
 
+    // call any on_start functions for extensions
+    if(Array.isArray(trial.extensions)){
+      for(var i=0; i<trial.extensions.length; i++){
+        jsPsych.extensions[trial.extensions[i].type].on_start(current_trial.extensions[i].params);
+      }
+    }
+
     // apply the focus to the element containing the experiment.
     DOM_container.focus();
 
@@ -969,6 +1021,13 @@ window.jsPsych = (function() {
     // call trial specific loaded callback if it exists
     if(typeof trial.on_load == 'function'){
       trial.on_load();
+    }
+
+    // call any on_load functions for extensions
+    if(Array.isArray(trial.extensions)){
+      for(var i=0; i<trial.extensions.length; i++){
+        jsPsych.extensions[trial.extensions[i].type].on_load(current_trial.extensions[i].params);
+      }
     }
     
     // done with callbacks
@@ -1247,6 +1306,10 @@ jsPsych.plugins = (function() {
   }
 
   return module;
+})();
+
+jsPsych.extensions = (function(){
+  return {};
 })();
 
 jsPsych.data = (function() {
@@ -1775,6 +1838,9 @@ jsPsych.data = (function() {
       var line = '';
       for (var j = 0; j < columns.length; j++) {
         var value = (typeof array[i][columns[j]] === 'undefined') ? '' : array[i][columns[j]];
+        if(typeof value == 'object') {
+          value = JSON.stringify(value);
+        }
         var valueString = value + "";
         line += '"' + valueString.replace(/"/g, '""') + '",';
       }
@@ -2204,7 +2270,7 @@ jsPsych.pluginAPI = (function() {
       start_time = parameters.audio_context_start_time;
     }
 
-    var case_sensitive = jsPsych.initSettings().case_sensitive_responses;
+    var case_sensitive = (typeof jsPsych.initSettings().case_sensitive_responses === 'undefined') ? false : jsPsych.initSettings().case_sensitive_responses;
 
     var listener_id;
 
@@ -2327,16 +2393,27 @@ jsPsych.pluginAPI = (function() {
   }
 
   module.compareKeys = function(key1, key2){
-    console.warn('Warning: The jsPsych.pluginAPI.compareKeys function will be removed in future jsPsych releases. '+
-    'We recommend removing this function and using strings to identify/compare keys.');
-    // convert to numeric values no matter what
-    if(typeof key1 == 'string') {
-      key1 = module.convertKeyCharacterToKeyCode(key1);
+    if (Number.isFinite(key1) || Number.isFinite(key2)) {
+      // if either value is a numeric keyCode, then convert both to numeric keyCode values and compare (maintained for backwards compatibility)
+      if(typeof key1 == 'string') {
+        key1 = module.convertKeyCharacterToKeyCode(key1);
+      }
+      if(typeof key2 == 'string') {
+        key2 = module.convertKeyCharacterToKeyCode(key2);
+      }
+      return key1 == key2;
+    } else if (typeof key1 === 'string' && typeof key2 === 'string') {
+      // if both values are strings, then check whether or not letter case should be converted before comparing (case_sensitive_responses in jsPsych.init)
+      var case_sensitive = (typeof jsPsych.initSettings().case_sensitive_responses === 'undefined') ? false : jsPsych.initSettings().case_sensitive_responses;
+      if (case_sensitive) {
+        return key1 == key2;
+      } else {
+        return key1.toLowerCase() == key2.toLowerCase();
+      }
+    } else {
+      console.error('Error in jsPsych.pluginAPI.compareKeys: arguments must be either numeric key codes or key strings.');
+      return undefined;
     }
-    if(typeof key2 == 'string') {
-      key2 = module.convertKeyCharacterToKeyCode(key2);
-    }
-    return key1 == key2;
   }
 
   var keylookup = {
@@ -2477,12 +2554,22 @@ jsPsych.pluginAPI = (function() {
 
   module.getAudioBuffer = function(audioID) {
 
-    if (audio_buffers[audioID] === 'tmp') {
-      console.error('Audio file failed to load in the time allotted.')
-      return;
-    }
-
-    return audio_buffers[audioID];
+    return new Promise(function(resolve, reject){
+      // check whether audio file already preloaded
+      if(typeof audio_buffers[audioID] == 'undefined' || audio_buffers[audioID] == 'tmp'){
+         // if audio is not already loaded, try to load it
+        function complete(){
+          resolve(audio_buffers[audioID])
+        }
+        function error(e){
+          reject(e.error);
+        }
+        module.preloadAudio([audioID], complete, function(){}, error)
+      } else {
+        // audio is already loaded
+        resolve(audio_buffers[audioID]);
+      }
+    });
 
   }
 

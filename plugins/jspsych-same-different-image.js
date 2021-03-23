@@ -128,24 +128,24 @@ jsPsych.plugins['same-different-image'] = (function() {
         var skey = trial.same_key;
         var dkey = trial.different_key;
 
-        if (info.key == skey && trial.answer == 'same') {
+        if (jsPsych.pluginAPI.compareKeys(info.key,skey) && trial.answer == 'same') {
           correct = true;
         }
 
-        if (info.key == dkey && trial.answer == 'different') {
+        if (jsPsych.pluginAPI.compareKeys(info.key, dkey) && trial.answer == 'different') {
           correct = true;
         }
 
         var trial_data = {
-          "rt": info.rt,
-          "answer": trial.answer,
-          "correct": correct,
-          "stimulus": JSON.stringify([trial.stimuli[0], trial.stimuli[1]]),
-          "key_press": info.key
+          rt: info.rt,
+          answer: trial.answer,
+          correct: correct,
+          stimulus: [trial.stimuli[0], trial.stimuli[1]],
+          response: info.key
         };
         if (first_stim_info) {
           trial_data["rt_stim1"] = first_stim_info.rt;
-          trial_data["key_press_stim1"] = first_stim_info.key;
+          trial_data["response_stim1"] = first_stim_info.key;
         }
 
         display_element.innerHTML = '';

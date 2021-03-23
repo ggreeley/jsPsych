@@ -191,8 +191,8 @@ jsPsych.plugins.instructions = (function() {
       display_element.innerHTML = '';
 
       var trial_data = {
-        "view_history": JSON.stringify(view_history),
-        "rt": performance.now() - start_time
+        view_history: view_history,
+        rt: performance.now() - start_time
       };
 
       jsPsych.finishTrial(trial_data);
@@ -209,13 +209,13 @@ jsPsych.plugins.instructions = (function() {
         allow_held_key: false
       });
       // check if key is forwards or backwards and update page
-      if (info.key == trial.key_backward) {
+      if (jsPsych.pluginAPI.compareKeys(info.key, trial.key_backward)) {
         if (current_page !== 0 && trial.allow_backward) {
           back();
         }
       }
 
-      if (info.key == trial.key_forward) {
+      if (jsPsych.pluginAPI.compareKeys(info.key, trial.key_forward)) {
         next();
       }
 

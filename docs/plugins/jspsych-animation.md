@@ -4,7 +4,7 @@ This plugin displays a sequence of images at a fixed frame rate. The sequence ca
 
 ## Parameters
 
-In addition to the [parameters available in all plugins](overview.md#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Other parameters can be left unspecified if the default value is acceptable.
+In addition to the [parameters available in all plugins](/overview/plugins#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Other parameters can be left unspecified if the default value is acceptable.
 
 Parameter | Type | Default Value | Description
 ----------|------|---------------|------------
@@ -18,12 +18,12 @@ render_on_canvas | boolean | true | If true, the images will be drawn onto a can
 
 ## Data Generated
 
-In addition to the [default data collected by all plugins](overview.md#data-collected-by-plugins), this plugin collects the following data for each trial.
+In addition to the [default data collected by all plugins](/overview/plugins#data-collected-by-all-plugins), this plugin collects the following data for each trial.
 
 Name | Type | Value
 -----|------|------
-animation_sequence | JSON | An array, encoded in JSON format. Each element of the array is an object that represents a stimulus in the animation sequence. Each object has a `stimulus` property, which is the image that was displayed, and a `time` property, which is the time in ms, measured from when the sequence began, that the stimulus was displayed.
-responses | JSON | An array, encoded in JSON format. Each element of the array is an object representing a response given by the subject. Each object has a `stimulus` property, indicating which image was displayed when the key was pressed, an `rt` property, indicating the time of the key press relative to the start of the animation, and a `key_press` property, indicating which key was pressed.
+animation_sequence | array | An array, where each element is an object that represents a stimulus in the animation sequence. Each object has a `stimulus` property, which is the image that was displayed, and a `time` property, which is the time in ms, measured from when the sequence began, that the stimulus was displayed. The array will be encoded in JSON format when data is saved using either the `.json()` or `.csv()` functions.
+response | array | An array, where each element is an object representing a response given by the subject. Each object has a `stimulus` property, indicating which image was displayed when the key was pressed, an `rt` property, indicating the time of the key press relative to the start of the animation, and a `key_press` property, indicating which key was pressed. The array will be encoded in JSON format when data is saved using either the `.json()` or `.csv()` functions.
 
 ## Examples
 

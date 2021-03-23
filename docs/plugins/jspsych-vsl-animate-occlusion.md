@@ -10,7 +10,7 @@ This plugin requires the Snap.svg library, available at [http://www.snapsvg.io](
 
 ## Parameters
 
-In addition to the [parameters available in all plugins](overview.md#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Other parameters can be left unspecified if the default value is acceptable.
+In addition to the [parameters available in all plugins](/overview/plugins#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Other parameters can be left unspecified if the default value is acceptable.
 
 | Parameter             | Type             | Default Value      | Description                              |
 | --------------------- | ---------------- | ------------------ | ---------------------------------------- |
@@ -25,12 +25,12 @@ In addition to the [parameters available in all plugins](overview.md#parameters-
 
 ## Data Generated
 
-In addition to the [default data collected by all plugins](overview.md#data-collected-by-plugins), this plugin collects the following data for each trial.
+In addition to the [default data collected by all plugins](/overview/plugins#data-collected-by-all-plugins), this plugin collects the following data for each trial.
 
 | Name      | Type        | Value                                    |
 | --------- | ----------- | ---------------------------------------- |
-| stimulus  | JSON string | A JSON encoded array where each element of the array is a stimulus from the sequence, in the order that they were shown. |
-| responses | JSON string | A JSON encoded array containing all response information. The encoded object is an array containing one element for each valid response. Each response item has three properties: `key` the key that was pressed, `stimulus` the index of the stimulus that was displayed when the response was made, and `rt` the response time measured since the start of the sequence. |
+| stimulus  | array | Array where each element is a stimulus from the sequence, in the order that they were shown. This will be encoded as a JSON string when data is saved using the `.json()` or `.csv()` functions. |
+| response | array | Array containing all response information. Each element in the array is an object representing each valid response. Each response item has three properties: `key` the key that was pressed, `stimulus` the index of the stimulus that was displayed when the response was made, and `rt` the response time measured since the start of the sequence. This will be encoded as a JSON string when data is saved using the `.json()` or `.csv()` functions. |
 
 ## Examples
 

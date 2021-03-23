@@ -185,24 +185,6 @@ var face_name_procedure = {
 }
 ```
 
-### Repeating trials
-
-If we want to repeat the set of trials multiple times, then we can set `repetitions` to an integer. If `randomize_order` is also `true`, the order will re-randomize before every repetition.
-
-```javascript
-var face_name_procedure = {
-	// timeline parameter hidden to save space ...
-	timeline_variables: [
-		{ face: 'person-1.jpg', name: 'Alex' },
-		{ face: 'person-2.jpg', name: 'Beth' },
-		{ face: 'person-3.jpg', name: 'Chad' },
-		{ face: 'person-4.jpg', name: 'Dave' }
-	],
-	randomize_order: true,
-	repetitions: 3
-}
-```
-
 ### Sampling methods
 
 There are also a set of sampling methods that can be used to select a set of trials from the timeline_variables. Sampling is declared by creating a `sample` parameter. The `sample` parameter is given an object of arguments. The `type` parameter in this object controls the type of sampling that is done. Valid values for `type` are 
@@ -325,9 +307,41 @@ var face_name_procedure = {
 }
 ```
 
+## Repeating a set of trials
+
+To repeat a timeline multiple times, you can create an object (node) that contains a `timeline`, which is the timeline array to repeat, and `repetitions`, which is the number of times to repeat that timeline. 
+
+```javascript
+var trial = {
+	type: 'html-keyboard-response',
+	stimulus: 'This trial will be repeated twice.'
+}
+
+var node = {
+	timeline: [trial],
+	repetitions: 2
+}
+```
+
+The `repetitions` parameter can be used alongside other node parameters, such as timeline variables, loop functions, and/or conditional functions. If you are using `timeline_variables` and `randomize_order` is `true`, then the order of the timeline variables will re-randomize before every repetition.
+
+```javascript
+var face_name_procedure = {
+	// timeline parameter hidden to save space ...
+	timeline_variables: [
+		{ face: 'person-1.jpg', name: 'Alex' },
+		{ face: 'person-2.jpg', name: 'Beth' },
+		{ face: 'person-3.jpg', name: 'Chad' },
+		{ face: 'person-4.jpg', name: 'Dave' }
+	],
+	randomize_order: true,
+	repetitions: 3 
+}
+```
+
 ## Looping timelines
 
-Any timeline can be looped using the `loop_function` option. The loop function should be a function that evaluates to `true` if the timeline should repeat, and `false` if the timeline should end. It receives a single parameter: the DataCollection object with all of the data from the trials executed in the last iteration of the timeline. The loop function will be evaluated after the timeline is completed.
+Any timeline can be looped using the `loop_function` option. The loop function should be a function that evaluates to `true` if the timeline should repeat, and `false` if the timeline should end. It receives a single parameter, named `data` by convention. This parameter will be the [DataCollection object](/core_library/jspsych-data/#datacollection) with all of the data from the trials executed in the last iteration of the timeline. The loop function will be evaluated after the timeline is completed.
 
 ```javascript
 var trial = {
@@ -338,7 +352,7 @@ var trial = {
 var loop_node = {
 	timeline: [trial],
 	loop_function: function(data){
-		if(data.values()[0].key_press == 'r'){
+		if(jsPsych.pluginAPI.compareKeys(data.values()[0].response, 'r')){
 			return true;
 		} else {
 			return false;
@@ -368,7 +382,7 @@ var if_node = {
 		// get the data from the previous trial,
 		// and check which key was pressed
 		var data = jsPsych.data.get().last(1).values()[0];
-		if(data.key_press == 's'){
+		if(jsPsych.pluginAPI.compareKeys(data.response, 's')){
 			return false;
 		} else {
 			return true;
@@ -385,4 +399,59 @@ jsPsych.init({
 	timeline: [pre_if_trial, if_node, after_if_trial],
 	on_finish: function(){jsPsych.data.displayData(); }
 });
+```
+
+## Timeline start and finish functions
+
+You can run a custom function at the start and end of a timeline node using the `on_timeline_start` and `on_timeline_finish` callback function parameters. These are functions that will run when the timeline starts and ends, respectively. 
+
+```javascript
+var procedure = {
+	timeline: [trial_1, trial_2],
+	on_timeline_start: function() {
+		console.log('The trial procedure just started.')
+	},
+	on_timeline_finish: function() {
+		console.log('The trial procedure just finished.')
+	}
+}
+```
+
+This works the same way with timeline variables. The `on_timeline_start` and `on_timeline_finish` functions will run when timeline variables trials start and end, respectively.
+
+```javascript
+var face_name_procedure = {
+	// timeline parameter hidden to save space ...
+	timeline_variables: [
+		{ face: 'person-1.jpg', name: 'Alex' },
+		{ face: 'person-2.jpg', name: 'Beth' },
+		{ face: 'person-3.jpg', name: 'Chad' },
+		{ face: 'person-4.jpg', name: 'Dave' }
+	],
+	randomize_order: true,
+	on_timeline_start: function() {
+		console.log('First trial is starting.')
+	},
+	on_timeline_finish: function() {
+		console.log('Last trial just finished.')
+	}
+}
+```
+
+When the `repetititons` option is used (and is greater than 1), these functions will run once per repetition of the timeline.
+
+```javascript
+var repetition_count = 0;
+
+var procedure = {
+	timeline: [trial_1, trial_2],
+	repetitions: 3,
+	on_timeline_start: function() {
+		repetition_count++;
+		console.log('Repetition number ',repetition_count,' has just started.');
+	},
+	on_timeline_finish: function() {
+		console.log('Repetition number ',repetition_count,' has just finished.')
+	}
+}
 ```

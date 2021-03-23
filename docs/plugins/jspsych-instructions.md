@@ -4,7 +4,7 @@ This plugin is for showing instructions to the subject. It allows subjects to na
 
 ## Parameters	
 
-In addition to the [parameters available in all plugins](overview.md#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Other parameters can be left unspecified if the default value is acceptable.
+In addition to the [parameters available in all plugins](/overview/plugins#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Other parameters can be left unspecified if the default value is acceptable.
 
 | Parameter             | Type    | Default Value | Description                              |
 | --------------------- | ------- | ------------- | ---------------------------------------- |
@@ -21,11 +21,11 @@ In addition to the [parameters available in all plugins](overview.md#parameters-
 
 ## Data Generated
 
-In addition to the [default data collected by all plugins](overview.md#data-collected-by-plugins), this plugin collects the following data for each trial.
+In addition to the [default data collected by all plugins](/overview/plugins#data-collected-by-all-plugins), this plugin collects the following data for each trial.
 
 | Name         | Type        | Value                                    |
 | ------------ | ----------- | ---------------------------------------- |
-| view_history | JSON string | A JSON string containing the order of pages the subject viewed (including when the subject returned to previous pages) and the time spent viewing each page. |
+| view_history | array       | An array containing the order of pages the subject viewed (including when the subject returned to previous pages) and the time spent viewing each page. Each object in the array represents a single page view, and contains keys called `page_index` (the page number, starting with 0) and `viewing_time` (duration of the page view). This will be encoded as a JSON string when data is saved using the `.json()` or `.csv()` functions. |
 | rt           | numeric     | The response time in milliseconds for the subject to view all of the pages. |
 
 ## Example

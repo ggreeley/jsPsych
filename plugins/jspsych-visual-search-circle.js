@@ -179,8 +179,8 @@ jsPsych.plugins["visual-search-circle"] = (function() {
 
         var correct = false;
 
-        if ((info.key == trial.target_present_key) && trial.target_present ||
-            (info.key == trial.target_absent_key) && !trial.target_present) {
+        if ((jsPsych.pluginAPI.compareKeys(info.key, trial.target_present_key)) && trial.target_present ||
+            (jsPsych.pluginAPI.compareKeys(info.key, trial.target_absent_key)) && !trial.target_present) {
           correct = true;
         }
 
@@ -234,8 +234,8 @@ jsPsych.plugins["visual-search-circle"] = (function() {
       var trial_data = {
         correct: correct,
         rt: rt,
-        key_press: key_press,
-        locations: JSON.stringify(display_locs),
+        response: key_press,
+        locations: display_locs,
         target_present: trial.target_present,
         set_size: trial.set_size
       };

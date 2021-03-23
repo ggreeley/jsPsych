@@ -9,7 +9,7 @@ For optimal performance, fullscreen mode should be manually triggered by the use
 
 ## Parameters
 
-In addition to the [parameters available in all plugins](overview.md#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Parameters can be left unspecified if the default value is acceptable.
+In addition to the [parameters available in all plugins](/overview/plugins#parameters-available-in-all-plugins), this plugin accepts the following parameters. Parameters with a default value of *undefined* must be specified. Parameters can be left unspecified if the default value is acceptable.
 
 | Parameter                | Type             | Default Value        | Descripton                               |
 | ------------------------ | ---------------- | -------------------- | ---------------------------------------- |
@@ -59,16 +59,16 @@ In addition to the [parameters available in all plugins](overview.md#parameters-
 
 ## Data Generated
 
-In addition to the [default data collected by all plugins](overview.md#data-collected-by-plugins), this plugin collects all parameter data described above and the following data for each trial.
+In addition to the [default data collected by all plugins](/overview/plugins#data-collected-by-all-plugins), this plugin collects all parameter data described above and the following data for each trial.
 
 | Name             | Type        | Value                                    |
 | ---------------- | ----------- | ---------------------------------------- |
 | rt               | numeric     | The response time in ms for the subject to make a response. |
-| key_press        | string      | The key that the subject pressed.        |
+| response         | string      | The key that the subject pressed.        |
 | correct          | boolean     | Whether or not the subject's key press corresponded to those provided in correct_choice. |
 | frame_rate       | numeric     | The average frame rate for the trial. 0 denotes that the subject responded before the appearance of the second frame. |
 | number_of_frames | numeric     | The number of frames that was shown in this trial. |
-| frame_rate_array | JSON string | The array that holds the number of miliseconds for each frame in this trial. |
+| frame_rate_array | array       | The array that holds the number of miliseconds for each frame in this trial. This will be encoded as a JSON string when data is saved using the `.json()` or `.csv()` functions. |
 | canvas_width     | numeric     | The width of the canvas in pixels.       |
 | canvas_height    | numeric     | The height of the canvas in pixels.      |
 

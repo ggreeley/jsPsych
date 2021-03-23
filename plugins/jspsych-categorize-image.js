@@ -132,16 +132,16 @@ jsPsych.plugins['categorize-image'] = (function() {
       jsPsych.pluginAPI.cancelAllKeyboardResponses();
 
       var correct = false;
-      if (trial.key_answer == info.key) {
+      if (jsPsych.pluginAPI.compareKeys(trial.key_answer, info.key)) {
         correct = true;
       }
 
       // save data
       trial_data = {
-        "rt": info.rt,
-        "correct": correct,
-        "stimulus": trial.stimulus,
-        "key_press": info.key
+        rt: info.rt,
+        correct: correct,
+        stimulus: trial.stimulus,
+        response: info.key
       };
 
       display_element.innerHTML = '';

@@ -171,11 +171,11 @@ jsPsych.plugins["serial-reaction-time"] = (function() {
 
       // gather the data to store for the trial
       var trial_data = {
-        "rt": response.rt,
-        "key_press": response.key,
-				"correct": response.correct,
-				"grid": JSON.stringify(trial.grid),
-				"target": JSON.stringify(trial.target)
+        rt: response.rt,
+        response: response.key,
+				correct: response.correct,
+				grid: trial.grid,
+				target: trial.target
       };
 
       // clear the display
@@ -197,7 +197,7 @@ jsPsych.plugins["serial-reaction-time"] = (function() {
 			for(var i=0; i<trial.choices.length; i++){
 				for(var j=0; j<trial.choices[i].length; j++){
 					var t = trial.choices[i][j];
-					if(info.key == t){
+					if(jsPsych.pluginAPI.compareKeys(info.key, t)){
 						responseLoc = [i,j];
 						break;
 					}
